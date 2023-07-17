@@ -18,6 +18,7 @@ import ru.netology.singlealbum.viewmodel.PlayerViewModel
 
 class MainActivity : AppCompatActivity() {
 
+    private val handler = Handler(Looper.getMainLooper())
     private lateinit var binding: ActivityMainBinding
     private lateinit var mediaObserver: MediaLifecycleObserver
     private lateinit var track: Track
@@ -74,7 +75,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun play(track: Track) {
-        mediaObserver.player?.setOnCompletionListener() {
+        mediaObserver.player?.setOnCompletionListener {
             playNextTrack()
         }
 
@@ -128,7 +129,6 @@ class MainActivity : AppCompatActivity() {
         val seekBar = binding.seekBar
         seekBar.max = mediaObserver.player!!.duration
 
-        val handler = Handler(Looper.getMainLooper())
         handler.postDelayed(object : Runnable {
             override fun run() {
                 try {
@@ -146,5 +146,10 @@ class MainActivity : AppCompatActivity() {
             mediaObserver.onStateChanged(this@MainActivity, Lifecycle.Event.ON_PAUSE)
         }
         super.onStop()
+    }
+
+    override fun onDestroy() {
+        handler.removeCallbacksAndMessages(null)
+        super.onDestroy()
     }
 }
